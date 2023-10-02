@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"github.com/FrizkyErlang/bookings/pkg/config"
-	"github.com/FrizkyErlang/bookings/pkg/models"
+	"github.com/FrizkyErlang/bookings/internal/config"
+	"github.com/FrizkyErlang/bookings/internal/models"
 	"github.com/justinas/nosurf"
 )
 

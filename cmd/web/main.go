@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/FrizkyErlang/bookings/pkg/config"
-	"github.com/FrizkyErlang/bookings/pkg/handlers"
-	"github.com/FrizkyErlang/bookings/pkg/render"
+	"github.com/FrizkyErlang/bookings/internal/config"
+	"github.com/FrizkyErlang/bookings/internal/handlers"
+	"github.com/FrizkyErlang/bookings/internal/render"
 	"github.com/alexedwards/scs/v2"
 )
 

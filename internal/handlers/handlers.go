@@ -6,9 +6,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/FrizkyErlang/bookings/pkg/config"
-	"github.com/FrizkyErlang/bookings/pkg/models"
-	"github.com/FrizkyErlang/bookings/pkg/render"
+	"github.com/FrizkyErlang/bookings/internal/config"
+	"github.com/FrizkyErlang/bookings/internal/models"
+	"github.com/FrizkyErlang/bookings/internal/render"
 )
 
 // Repo the repository used by the handlers
