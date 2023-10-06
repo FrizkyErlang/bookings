@@ -1,12 +1,14 @@
 package main
 
 import (
+	"encoding/gob"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/FrizkyErlang/bookings/internal/config"
 	"github.com/FrizkyErlang/bookings/internal/handlers"
+	"github.com/FrizkyErlang/bookings/internal/models"
 	"github.com/FrizkyErlang/bookings/internal/render"
 	"github.com/alexedwards/scs/v2"
 )
@@ -17,6 +19,8 @@ var app config.AppConfig
 var session *scs.SessionManager
 
 func main() {
+	// what am I going to put in the session
+	gob.Register(models.Reservation{})
 
 	// change this true when in production
 	app.InProduction = false
