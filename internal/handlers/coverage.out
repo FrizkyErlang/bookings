@@ -1,0 +1,22 @@
+mode: set
+github.com/FrizkyErlang/bookings/internal/handlers/handlers.go:24.47,28.2 1 1
+github.com/FrizkyErlang/bookings/internal/handlers/handlers.go:31.33,33.2 1 1
+github.com/FrizkyErlang/bookings/internal/handlers/handlers.go:35.67,40.2 3 1
+github.com/FrizkyErlang/bookings/internal/handlers/handlers.go:42.68,54.2 5 1
+github.com/FrizkyErlang/bookings/internal/handlers/handlers.go:56.74,65.2 4 1
+github.com/FrizkyErlang/bookings/internal/handlers/handlers.go:67.78,69.16 2 1
+github.com/FrizkyErlang/bookings/internal/handlers/handlers.go:69.16,72.3 2 0
+github.com/FrizkyErlang/bookings/internal/handlers/handlers.go:74.2,89.19 7 1
+github.com/FrizkyErlang/bookings/internal/handlers/handlers.go:89.19,98.3 4 0
+github.com/FrizkyErlang/bookings/internal/handlers/handlers.go:99.2,101.66 2 1
+github.com/FrizkyErlang/bookings/internal/handlers/handlers.go:104.71,106.2 1 1
+github.com/FrizkyErlang/bookings/internal/handlers/handlers.go:108.69,110.2 1 1
+github.com/FrizkyErlang/bookings/internal/handlers/handlers.go:112.75,114.2 1 1
+github.com/FrizkyErlang/bookings/internal/handlers/handlers.go:116.79,120.2 3 1
+github.com/FrizkyErlang/bookings/internal/handlers/handlers.go:127.79,134.16 3 1
+github.com/FrizkyErlang/bookings/internal/handlers/handlers.go:134.16,136.3 1 0
+github.com/FrizkyErlang/bookings/internal/handlers/handlers.go:137.2,138.14 2 1
+github.com/FrizkyErlang/bookings/internal/handlers/handlers.go:141.70,143.2 1 1
+github.com/FrizkyErlang/bookings/internal/handlers/handlers.go:145.81,147.9 2 1
+github.com/FrizkyErlang/bookings/internal/handlers/handlers.go:147.9,152.3 4 1
+github.com/FrizkyErlang/bookings/internal/handlers/handlers.go:154.2,161.4 4 0
