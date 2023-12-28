@@ -6,10 +6,13 @@ import (
 	"net/http"
 
 	"github.com/FrizkyErlang/bookings/internal/config"
+	"github.com/FrizkyErlang/bookings/internal/driver"
 	"github.com/FrizkyErlang/bookings/internal/forms"
 	"github.com/FrizkyErlang/bookings/internal/helpers"
 	"github.com/FrizkyErlang/bookings/internal/models"
 	"github.com/FrizkyErlang/bookings/internal/render"
+	"github.com/FrizkyErlang/bookings/internal/repository"
+	"github.com/FrizkyErlang/bookings/internal/repository/dbrepo"
 )
 
 // Repo the repository used by the handlers
@@ -18,12 +21,14 @@ var Repo *Repository
 // Repository is the repository type
 type Repository struct {
 	App *config.AppConfig
+	DB  repository.DatabaseRepo
 }
 
 // NewRepo creates a new repository
-func NewRepo(a *config.AppConfig) *Repository {
+func NewRepo(a *config.AppConfig, db *driver.DB) *Repository {
 	return &Repository{
 		App: a,
+		DB:  dbrepo.NewPostgresRepo(db.SQL, a),
 	}
 }
 
