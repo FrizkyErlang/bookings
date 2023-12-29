@@ -26,6 +26,7 @@ func (m *postgresDBRepo) InsertReservation(res models.Reservation) error {
 		res.Email,
 		res.Phone,
 		res.StartDate,
+		res.EndDate,
 		res.RoomID,
 		time.Now(),
 		time.Now(),
