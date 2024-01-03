@@ -1,6 +1,7 @@
 package dbrepo
 
 import (
+	"errors"
 	"time"
 
 	"github.com/FrizkyErlang/bookings/internal/models"
@@ -35,6 +36,9 @@ func (m *testDBRepo) SearchAvailabilityForAllRooms(start, end time.Time) ([]mode
 // GetRoomByID get a room by its id
 func (m *testDBRepo) GetRoomByID(id int) (models.Room, error) {
 	var room models.Room
+	if id > 1 {
+		return room, errors.New("Error get room")
+	}
 
 	return room, nil
 }
