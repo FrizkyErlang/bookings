@@ -2,6 +2,7 @@ package dbrepo
 
 import (
 	"errors"
+	"log"
 	"time"
 
 	"github.com/FrizkyErlang/bookings/internal/models"
@@ -14,7 +15,7 @@ func (m *testDBRepo) AllUsers() bool {
 // InsertReservation insert reservation into database
 func (m *testDBRepo) InsertReservation(res models.Reservation) (int, error) {
 	if res.RoomID == 2 {
-		return 0, errors.New("Error get room")
+		return 0, errors.New("error get room")
 	}
 	return 1, nil
 }
@@ -22,14 +23,39 @@ func (m *testDBRepo) InsertReservation(res models.Reservation) (int, error) {
 // InsertRoomRestriction insert room restriction into database
 func (m *testDBRepo) InsertRoomRestriction(r models.RoomRestriction) error {
 	if r.RoomID > 2 {
-		return errors.New("Error get room")
+		return errors.New("error get room")
 	}
 	return nil
 }
 
 // SearchAvailabilityByDatesByRoomID search room availability by dates in database for roomID
 func (m *testDBRepo) SearchAvailabilityByDatesByRoomID(start, end time.Time, roomID int) (bool, error) {
-	return false, nil
+	// set up a test time
+	layout := "2006-01-02"
+	str := "2049-12-31"
+	t, err := time.Parse(layout, str)
+	if err != nil {
+		log.Println(err)
+	}
+
+	// this is our test to fail the query -- specify 2060-01-01 as start
+	testDateToFail, err := time.Parse(layout, "2060-01-01")
+	if err != nil {
+		log.Println(err)
+	}
+
+	if start == testDateToFail {
+		return false, errors.New("error parsing start date")
+	}
+
+	// if the start date is after 2049-12-31, then return false,
+	// indicating no availability;
+	if start.After(t) {
+		return false, nil
+	}
+
+	// otherwise, we have availability
+	return true, nil
 }
 
 // SearchAvailabilityForAllRooms returns a slice of available rooms, if any for given date range
@@ -43,7 +69,7 @@ func (m *testDBRepo) SearchAvailabilityForAllRooms(start, end time.Time) ([]mode
 func (m *testDBRepo) GetRoomByID(id int) (models.Room, error) {
 	var room models.Room
 	if id > 1 {
-		return room, errors.New("Error get room")
+		return room, errors.New("error get room")
 	}
 
 	return room, nil

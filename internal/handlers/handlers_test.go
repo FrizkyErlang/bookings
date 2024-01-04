@@ -2,21 +2,24 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/FrizkyErlang/bookings/internal/driver"
 	"github.com/FrizkyErlang/bookings/internal/models"
 )
 
-type postData struct {
-	key   string
-	value string
-}
+// type postData struct {
+// 	key   string
+// 	value string
+// }
 
 var theTests = []struct {
 	name               string
@@ -32,10 +35,6 @@ var theTests = []struct {
 	{"contact", "/contact", "GET", http.StatusOK},
 
 	// {"post search avail", "/search-availability", "POST", []postData{
-	// 	{key: "start", value: "2020-01-01"},
-	// 	{key: "end", value: "2020-01-02"},
-	// }, http.StatusOK},
-	// {"post search avail json", "/search-availability-json", "POST", []postData{
 	// 	{key: "start", value: "2020-01-01"},
 	// 	{key: "end", value: "2020-01-02"},
 	// }, http.StatusOK},
@@ -58,6 +57,15 @@ func TestHandlers(t *testing.T) {
 				t.Errorf("for %s, expected %d but got %d", e.name, e.expectedStatusCode, resp.StatusCode)
 			}
 		}
+	}
+}
+
+func TestNewRepo(t *testing.T) {
+	var db driver.DB
+	testRepo := NewRepo(&app, &db)
+
+	if reflect.TypeOf(testRepo).String() != "*handlers.Repository" {
+		t.Errorf("Did not get correct type from NewRepo: got %s, wanted *Repository", reflect.TypeOf(testRepo).String())
 	}
 }
 
@@ -223,5 +231,89 @@ func TestRepository_PostReservation(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 	if rr.Code != http.StatusTemporaryRedirect {
 		t.Errorf("PostReservation handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	}
+}
+
+func TestRepository_AvailabilityJSON(t *testing.T) {
+	var j jsonResponse
+
+	// first case room not available
+	reqBody := fmt.Sprintf("%s&%s&%s",
+		"start=2050-01-02",
+		"end=2050-01-04",
+		"roomID=1",
+	)
+	req, _ := http.NewRequest("POST", "/search-availability-json", strings.NewReader(reqBody))
+	ctx := getCtx(req)
+	req = req.WithContext(ctx)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	rr := httptest.NewRecorder()
+
+	handler := http.HandlerFunc(Repo.AvailabilityJSON)
+	handler.ServeHTTP(rr, req)
+	err := json.Unmarshal([]byte(rr.Body.String()), &j)
+	if err != nil {
+		t.Error("Failed to parse response json")
+	}
+	if j.OK {
+		t.Errorf("AvailabilityJSON handler returned wrong response availability: got %t, wanted %t", j.OK, false)
+	}
+
+	// second case room available
+	reqBody = fmt.Sprintf("%s&%s&%s",
+		"start=2040-01-02",
+		"end=2040-01-04",
+		"roomID=1",
+	)
+	req, _ = http.NewRequest("POST", "/search-availability-json", strings.NewReader(reqBody))
+	ctx = getCtx(req)
+	req = req.WithContext(ctx)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	rr = httptest.NewRecorder()
+
+	handler.ServeHTTP(rr, req)
+	err = json.Unmarshal([]byte(rr.Body.String()), &j)
+	if err != nil {
+		t.Error("Failed to parse response json")
+	}
+	if !j.OK {
+		t.Errorf("AvailabilityJSON handler returned wrong response availability: got %t, wanted %t", j.OK, true)
+	}
+
+	// third case there's no body
+	req, _ = http.NewRequest("POST", "/search-availability-json", nil)
+	ctx = getCtx(req)
+	req = req.WithContext(ctx)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	rr = httptest.NewRecorder()
+
+	handler.ServeHTTP(rr, req)
+	err = json.Unmarshal([]byte(rr.Body.String()), &j)
+	if err != nil {
+		t.Error("Failed to parse response json")
+	}
+	if j.OK || j.Message != "Internal server error" {
+		t.Errorf("AvailabilityJSON handler returned wrong response availability: got %t, wanted %t", j.OK, false)
+	}
+
+	// fourth case failed in SearchAvailabilityByDatesByRoomID
+	reqBody = fmt.Sprintf("%s&%s&%s",
+		"start=2060-01-01",
+		"end=2060-01-04",
+		"roomID=1",
+	)
+	req, _ = http.NewRequest("POST", "/search-availability-json", strings.NewReader(reqBody))
+	ctx = getCtx(req)
+	req = req.WithContext(ctx)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	rr = httptest.NewRecorder()
+
+	handler.ServeHTTP(rr, req)
+	err = json.Unmarshal([]byte(rr.Body.String()), &j)
+	if err != nil {
+		t.Error("Failed to parse response json")
+	}
+	if j.OK || j.Message != "Error connecting to DB" {
+		t.Errorf("AvailabilityJSON handler returned wrong response availability: got %t, wanted %t", j.OK, false)
 	}
 }
