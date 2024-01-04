@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"errors"
 	"log"
 	"net/http"
 	"strconv"
@@ -11,7 +10,6 @@ import (
 	"github.com/FrizkyErlang/bookings/internal/config"
 	"github.com/FrizkyErlang/bookings/internal/driver"
 	"github.com/FrizkyErlang/bookings/internal/forms"
-	"github.com/FrizkyErlang/bookings/internal/helpers"
 	"github.com/FrizkyErlang/bookings/internal/models"
 	"github.com/FrizkyErlang/bookings/internal/render"
 	"github.com/FrizkyErlang/bookings/internal/repository"
@@ -338,13 +336,17 @@ func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) 
 func (m *Repository) ChooseRoom(w http.ResponseWriter, r *http.Request) {
 	roomID, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
-		helpers.ServerError(w, err)
+		log.Println(err)
+		m.App.Session.Put(r.Context(), "error", "missing url parameter")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
 
 	res, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
-		helpers.ServerError(w, errors.New("cannot get reservation from session"))
+		m.App.ErrorLog.Println("Cannot get item from session")
+		m.App.Session.Put(r.Context(), "error", "Can't get reservation from session")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
 	res.RoomID = roomID
@@ -361,20 +363,14 @@ func (m *Repository) BookRoom(w http.ResponseWriter, r *http.Request) {
 	ed := r.URL.Query().Get("e")
 
 	layout := "2006-01-02"
-	startDate, err := time.Parse(layout, sd)
-	if err != nil {
-		helpers.ServerError(w, err)
-		return
-	}
-	endDate, err := time.Parse(layout, ed)
-	if err != nil {
-		helpers.ServerError(w, err)
-		return
-	}
+	startDate, _ := time.Parse(layout, sd)
+	endDate, _ := time.Parse(layout, ed)
 
 	room, err := m.DB.GetRoomByID(roomID)
 	if err != nil {
-		helpers.ServerError(w, err)
+		log.Println(err)
+		m.App.Session.Put(r.Context(), "error", "can not find room")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
 
