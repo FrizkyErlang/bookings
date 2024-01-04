@@ -251,7 +251,7 @@ func TestRepository_AvailabilityJSON(t *testing.T) {
 
 	handler := http.HandlerFunc(Repo.AvailabilityJSON)
 	handler.ServeHTTP(rr, req)
-	err := json.Unmarshal([]byte(rr.Body.String()), &j)
+	err := json.Unmarshal(rr.Body.Bytes(), &j)
 	if err != nil {
 		t.Error("Failed to parse response json")
 	}
@@ -272,7 +272,7 @@ func TestRepository_AvailabilityJSON(t *testing.T) {
 	rr = httptest.NewRecorder()
 
 	handler.ServeHTTP(rr, req)
-	err = json.Unmarshal([]byte(rr.Body.String()), &j)
+	err = json.Unmarshal(rr.Body.Bytes(), &j)
 	if err != nil {
 		t.Error("Failed to parse response json")
 	}
@@ -288,7 +288,7 @@ func TestRepository_AvailabilityJSON(t *testing.T) {
 	rr = httptest.NewRecorder()
 
 	handler.ServeHTTP(rr, req)
-	err = json.Unmarshal([]byte(rr.Body.String()), &j)
+	err = json.Unmarshal(rr.Body.Bytes(), &j)
 	if err != nil {
 		t.Error("Failed to parse response json")
 	}
@@ -309,7 +309,7 @@ func TestRepository_AvailabilityJSON(t *testing.T) {
 	rr = httptest.NewRecorder()
 
 	handler.ServeHTTP(rr, req)
-	err = json.Unmarshal([]byte(rr.Body.String()), &j)
+	err = json.Unmarshal(rr.Body.Bytes(), &j)
 	if err != nil {
 		t.Error("Failed to parse response json")
 	}
