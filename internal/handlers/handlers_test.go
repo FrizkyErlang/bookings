@@ -428,7 +428,7 @@ func TestRepository_ReservationSummary(t *testing.T) {
 	handler := http.HandlerFunc(Repo.ReservationSummary)
 	handler.ServeHTTP(rr, req)
 	if rr.Code != http.StatusOK {
-		t.Errorf("Reservation handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusOK)
+		t.Errorf("ReservationSummary handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusOK)
 	}
 
 	// second test no reservation in session
@@ -439,7 +439,7 @@ func TestRepository_ReservationSummary(t *testing.T) {
 
 	handler.ServeHTTP(rr, req)
 	if rr.Code != http.StatusTemporaryRedirect {
-		t.Errorf("Reservation handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+		t.Errorf("ReservationSummary handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
 	}
 }
 
@@ -465,7 +465,7 @@ func TestRepository_ChooseRoom(t *testing.T) {
 	handler := http.HandlerFunc(Repo.ChooseRoom)
 	handler.ServeHTTP(rr, req)
 	if rr.Code != http.StatusSeeOther {
-		t.Errorf("Reservation handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
+		t.Errorf("ChooseRoom handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 
 	// second test no reservation in session
@@ -479,7 +479,7 @@ func TestRepository_ChooseRoom(t *testing.T) {
 
 	handler.ServeHTTP(rr, req)
 	if rr.Code != http.StatusTemporaryRedirect {
-		t.Errorf("Reservation handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+		t.Errorf("ChooseRoom handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
 	}
 
 	// third test there's no room ID in url
@@ -490,6 +490,32 @@ func TestRepository_ChooseRoom(t *testing.T) {
 
 	handler.ServeHTTP(rr, req)
 	if rr.Code != http.StatusTemporaryRedirect {
-		t.Errorf("Reservation handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+		t.Errorf("ChooseRoom handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	}
+}
+
+func TestRepository_BookRoom(t *testing.T) {
+
+	// basic test
+	req, _ := http.NewRequest("GET", "/book-room?s=2050-01-01&e=2050-01-02&id=1", nil)
+	ctx := getCtx(req)
+	req = req.WithContext(ctx)
+	rr := httptest.NewRecorder()
+
+	handler := http.HandlerFunc(Repo.BookRoom)
+	handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("BookRoom handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
+	}
+
+	// third test there's no room ID in url
+	req, _ = http.NewRequest("GET", "/book-room?s=2050-01-01&e=2050-01-02&id=3", nil)
+	ctx = getCtx(req)
+	req = req.WithContext(ctx)
+	rr = httptest.NewRecorder()
+
+	handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusTemporaryRedirect {
+		t.Errorf("BookRoom handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
 	}
 }
