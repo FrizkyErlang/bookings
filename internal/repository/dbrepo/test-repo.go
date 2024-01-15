@@ -103,3 +103,22 @@ func (m *testDBRepo) GetRoomByID(id int) (models.Room, error) {
 
 	return room, nil
 }
+
+// GetUserByID returns a user by id
+func (m *testDBRepo) GetUserByID(id int) (models.User, error) {
+	var u models.User
+
+	return u, nil
+}
+
+// UpdateUser update a user in databases
+func (m *testDBRepo) UpdateUser(u models.User) error {
+
+	return nil
+}
+
+// Auntheticate auntheticate a user
+func (m *testDBRepo) Auntheticate(email, testPassword string) (int, string, error) {
+
+	return 1, "", nil
+}
