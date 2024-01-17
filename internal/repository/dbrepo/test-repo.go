@@ -122,3 +122,10 @@ func (m *testDBRepo) Auntheticate(email, testPassword string) (int, string, erro
 
 	return 1, "", nil
 }
+
+// AllReservations returns a slice of all reservations
+func (m *testDBRepo) AllReservations() ([]models.Reservation, error) {
+	var reservations []models.Reservation
+
+	return reservations, nil
+}

@@ -126,6 +126,7 @@ func (m *postgresDBRepo) SearchAvailabilityForAllRooms(start, end time.Time) ([]
 	if err != nil {
 		return rooms, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		var room models.Room
@@ -183,7 +184,8 @@ func (m *postgresDBRepo) GetUserByID(id int) (models.User, error) {
 	var u models.User
 
 	query := `
-			select id, first_name, last_name, email, password, access_level, created_at, updated_at
+			select id, first_name, last_name, email, password, access_level, created_at,
+			updated_at
 			from users 
 			where id = $1
 			;`
@@ -213,7 +215,8 @@ func (m *postgresDBRepo) UpdateUser(u models.User) error {
 
 	query := `
 			update users 
-			set first_name = $1, last_name = $2, email = $3, access_level = $4, updated_at = $5
+			set first_name = $1, last_name = $2, email = $3, access_level = $4,
+			updated_at = $5
 			where id = $6
 			;`
 
@@ -263,4 +266,56 @@ func (m *postgresDBRepo) Auntheticate(email, testPassword string) (int, string, 
 	}
 
 	return id, hashedPassword, nil
+}
+
+// AllReservations returns a slice of all reservations
+func (m *postgresDBRepo) AllReservations() ([]models.Reservation, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var reservations []models.Reservation
+
+	query := `
+			select r.id, r.first_name, r.last_name, r.email, r.phone, r.start_date,
+			r.end_date, r.room_id, r.created_at, r.updated_at, rm.id, rm.room_name
+			from reservations r
+			left join rooms rm on (r.room_id = rm.id)
+			order by r.start_date asc
+			;`
+
+	rows, err := m.DB.QueryContext(ctx, query)
+	if err != nil {
+		return reservations, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var i models.Reservation
+		err := rows.Scan(
+			&i.ID,
+			&i.FirstName,
+			&i.LastName,
+			&i.Email,
+			&i.Phone,
+			&i.StartDate,
+			&i.EndDate,
+			&i.RoomID,
+			&i.UpdateAt,
+			&i.CreatedAt,
+			&i.Room.ID,
+			&i.Room.RoomName,
+		)
+
+		if err != nil {
+			return reservations, err
+		}
+
+		reservations = append(reservations, i)
+	}
+
+	if err = rows.Err(); err != nil {
+		return reservations, err
+	}
+
+	return reservations, nil
 }
