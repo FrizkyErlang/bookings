@@ -20,4 +20,5 @@ type DatabaseRepo interface {
 	Auntheticate(email, testPassword string) (int, string, error)
 
 	AllReservations() ([]models.Reservation, error)
+	AllNewReservations() ([]models.Reservation, error)
 }
