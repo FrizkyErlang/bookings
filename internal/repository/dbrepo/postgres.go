@@ -82,7 +82,8 @@ func (m *postgresDBRepo) SearchAvailabilityByDatesByRoomID(start, end time.Time,
 			from room_restrictions  
 			where 
 				room_id = $1
-				and $2 < end_date and $3 > start_date 
+				and $2 < end_date
+				and $3 > start_date 
 			;`
 
 	row := m.DB.QueryRowContext(ctx, query,
@@ -115,7 +116,9 @@ func (m *postgresDBRepo) SearchAvailabilityForAllRooms(start, end time.Time) ([]
 			where r.id not in (
 				select rr.room_id
 				from room_restrictions rr
-				where $1 < rr.end_date and $2 > rr.start_date
+				where 
+					$1 < rr.end_date
+					and $2 > rr.start_date
 			)
 			;`
 
@@ -520,4 +523,54 @@ func (m *postgresDBRepo) AllRooms() ([]models.Room, error) {
 	}
 
 	return rooms, nil
+}
+
+// GetRestrictionsForRoomByDate returns restriction for a room by date range
+func (m *postgresDBRepo) GetRestrictionsForRoomByDate(roomID int, start, end time.Time) ([]models.RoomRestriction, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var restrictions []models.RoomRestriction
+
+	query := `
+			select id, coalesce(reservation_id, 0), restriction_id, room_id,
+			start_date, end_date
+			from room_restrictions
+			where
+				$1 < end_date
+				and $2 > start_date
+				and room_id = $3
+			;`
+
+	rows, err := m.DB.QueryContext(ctx, query,
+		start,
+		end,
+		roomID,
+	)
+	if err != nil {
+		return restrictions, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var r models.RoomRestriction
+		err := rows.Scan(
+			&r.ID,
+			&r.ReservationID,
+			&r.RestrictionID,
+			&r.RoomID,
+			&r.StartDate,
+			&r.EndDate,
+		)
+		if err != nil {
+			return restrictions, err
+		}
+
+		restrictions = append(restrictions, r)
+	}
+	if err = rows.Err(); err != nil {
+		return restrictions, err
+	}
+
+	return restrictions, nil
 }
