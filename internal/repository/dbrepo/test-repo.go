@@ -119,8 +119,12 @@ func (m *testDBRepo) UpdateUser(u models.User) error {
 
 // Auntheticate auntheticate a user
 func (m *testDBRepo) Auntheticate(email, testPassword string) (int, string, error) {
+	if email == "me@here.com" {
 
-	return 1, "", nil
+		return 1, "", nil
+	}
+
+	return 0, "", errors.New("some error")
 }
 
 // AllReservations returns a slice of all reservations
